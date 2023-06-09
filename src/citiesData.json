@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Moscow",
+    "connections": [
+      {
+        "id": 2,
+        "name": "Ufa",
+        "distance": 1100
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Ufa",
+    "connections": [
+      {
+        "id": 1,
+        "name": "Moscow",
+        "distance": 1100
+      },
+      {
+        "id": 3,
+        "name": "Sochi",
+        "distance": 2100
+      }
+    ]
+  }
+]
