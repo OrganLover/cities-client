@@ -1,10 +1,16 @@
 import {Dispatch, SetStateAction} from 'react'
 import {ICollectionAndRecylceConnection, IModal} from './otherTypes'
 import {IRecyclePoint} from './recyclePointTypes'
+import {ICity} from './cityTypes'
 
 export interface ICollectionPoint {
   id: number
-  cityId: number
+  city: {
+    id: number
+    name: string
+    createdAt: string
+    updatedAt: string
+  }
   name: string
   createdAt: string
   updatedAt: string
@@ -21,6 +27,12 @@ export interface ICollectionPointProps {
   setCurrentCollectionPoint: Dispatch<Partial<ICurrentCollectionPoint>>
   recyclePoints: IRecyclePoint[]
   connectWithRecyclePoint: (recyclePointId: number) => void
+  createCollectionPoint: () => void
+  deleteCollectionPoint: (collectionPointId: number) => void
+  openUpdateModal: (collectionPoint: ICollectionPoint) => void
+  onModalClose: () => void
+  updateCollectionPoint: () => void
+  disconnectWithRecyclePoint: (connectionId: number) => void
 }
 
 export interface ICurrentCollectionPoint extends ICollectionPoint {

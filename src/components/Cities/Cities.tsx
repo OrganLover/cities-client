@@ -1,5 +1,6 @@
 import {Modal} from '../common/Modal'
-import {ICitiesProps, ICityConnection} from '../../types/cityTypes'
+import {ICitiesProps} from '../../types/cityTypes'
+import Menu from '../common/Menu'
 
 function Cities({
   cities,
@@ -17,11 +18,12 @@ function Cities({
 }: ICitiesProps) {
   return (
     <div>
+      <Menu />
       <button onClick={openAddCityModal}>Add city</button>
       <div>
         {cities.map((city) => {
           return (
-            <div key={city.id} style={{backgroundColor: 'lightgrey'}}>
+            <div key={city.id} style={{backgroundColor: 'lightgrey', fontSize: '20px'}}>
               <span>{city.name}</span>
               <div>
                 {city.connections.length !== 0 && <b>connected cities: </b>}
@@ -62,7 +64,14 @@ function Cities({
                   return (
                     <div key={city.id} style={{display: 'flex', justifyContent: 'space-between'}}>
                       <span>{city.name}</span>
-                      <button onClick={() => addConnection(city.id)}>connect</button>
+                      {currentCity.connectionsToPost.some((con) => con.applierId === city.id) ? (
+                        <b>
+                          ready(distance:{' '}
+                          {currentCity.connectionsToPost.find((con) => con.applierId === city.id)?.distance})
+                        </b>
+                      ) : (
+                        <button onClick={() => addConnection(city.id)}>connect</button>
+                      )}
                     </div>
                   )
                 })}
@@ -97,6 +106,12 @@ function Cities({
                           (con) => con.applier.id === currentCity.id || con.initiator.id === currentCity.id,
                         ) ? (
                           <b>connected</b>
+                        ) : currentCity.connectionsToPost.some((con) => con.applierId === city.id) ? (
+                          <b>
+                            ready(distance:{' '}
+                            {currentCity.connectionsToPost.find((con) => con.applierId === city.id)?.distance}
+                            )
+                          </b>
                         ) : (
                           <button onClick={() => addConnection(city.id)}>connect</button>
                         )}

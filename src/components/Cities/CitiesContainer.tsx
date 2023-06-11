@@ -52,6 +52,7 @@ function CitiesContainer() {
             connections: currentCity.connectionsToPost,
           })
           cleanStateAndCloseModal()
+          getCities()
         } catch (err) {
           console.log(err)
         }
@@ -77,6 +78,7 @@ function CitiesContainer() {
           connections: currentCity.connectionsToPost,
         })
         cleanStateAndCloseModal()
+        getCities()
       } catch (err) {
         console.log(err)
       }
@@ -89,6 +91,7 @@ function CitiesContainer() {
       try {
         const {data} = await axios.delete(`cities/${city.id}`)
         cleanStateAndCloseModal()
+        getCities()
       } catch (err) {
         console.log(err)
       }
@@ -97,13 +100,15 @@ function CitiesContainer() {
 
   const addConnection = (applierId: number) => {
     let distance = Number(window.prompt('please enter a distance'))
-    setCurrentCity({
-      connectionsToPost: [...currentCity.connectionsToPost, {applierId, distance}],
-    })
+    if (distance) {
+      setCurrentCity({
+        connectionsToPost: [...currentCity.connectionsToPost, {applierId, distance}],
+      })
+    }
   }
 
   const deleteConnection = async (con: ICityConnection) => {
-    const value = window.confirm(`you sure you want to delete connection with ??? ?`)
+    const value = window.confirm(`you sure you want to delete connection?`)
     if (value) {
       try {
         const {data} = await axios.delete(`connections/${con.id}`)
@@ -115,16 +120,12 @@ function CitiesContainer() {
   }
 
   const onModalClose = () => {
-    const value = window.confirm('you sure you want to exit? all changes will be canceled!')
-    if (value) {
-      cleanStateAndCloseModal()
-    }
+    cleanStateAndCloseModal()
   }
 
   const cleanStateAndCloseModal = () => {
     setCurrentCity(currentCityInit)
     setModal({mode: '', opened: false})
-    getCities()
   }
 
   return (

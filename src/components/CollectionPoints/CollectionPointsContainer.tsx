@@ -12,7 +12,12 @@ function CollectionPointsContainer() {
 
   const initState: ICurrentCollectionPoint = {
     id: 0,
-    cityId: 0,
+    city: {
+      id: 0,
+      name: '',
+      createdAt: '',
+      updatedAt: '',
+    },
     name: '',
     createdAt: '',
     updatedAt: '',
@@ -30,7 +35,7 @@ function CollectionPointsContainer() {
   useEffect(() => {
     getCollectionPoints()
     getRecyclePoints()
-  })
+  }, [])
 
   const getCollectionPoints = async () => {
     const {data} = await axios.get('collection-points')
@@ -43,17 +48,25 @@ function CollectionPointsContainer() {
   }
 
   const createCollectionPoint = async () => {
-    const {data} = await axios.post('collection-points', {
-      name: currentCollectionPoint.name,
-      trashCollectionSize: 0,
-      cityId: 0,
-      connectionWithRecycle: [],
-    })
+    if (currentCollectionPoint.name) {
+      try {
+        const {data} = await axios.post('collection-points', {
+          name: currentCollectionPoint.name,
+          trashCollectionSize: currentCollectionPoint.trashCollectionSize,
+          cityId: currentCollectionPoint.city.id,
+          connectionWithRecycle: currentCollectionPoint.connectionsWithRecycleToPost,
+        })
+        cleanStateAndCloseModal()
+        getCollectionPoints()
+      } catch (err) {
+        console.log(err)
+      }
+    }
   }
 
   const connectWithRecyclePoint = (recyclePointId: number) => {
     const distance = Number(window.prompt('enter a distance'))
-    const trashSize = Number(window.prompt('enter a trashSize'))
+    const trashSize = Number(window.prompt('enter a trashSize in percent'))
     if (distance && trashSize) {
       setCurrentCollectionPoint({
         connectionsWithRecycleToPost: [
@@ -61,6 +74,69 @@ function CollectionPointsContainer() {
           {trashSize, distance, recyclePointId},
         ],
       })
+    }
+  }
+
+  const openUpdateModal = (collectionPoint: ICollectionPoint) => {
+    setCurrentCollectionPoint({
+      id: collectionPoint.id,
+      city: collectionPoint.city,
+      name: collectionPoint.name,
+      trashCollectionSize: collectionPoint.trashCollectionSize,
+      trashLeftSize: collectionPoint.trashLeftSize,
+      connectionWithRecycle: collectionPoint.connectionWithRecycle,
+    })
+    setModal({mode: 'patch', opened: true})
+  }
+
+  const cleanStateAndCloseModal = () => {
+    setCurrentCollectionPoint(initState)
+    setModal({mode: '', opened: false})
+  }
+
+  const deleteCollectionPoint = async (collectionPointId: number) => {
+    const value = window.confirm('you sure you want to delete collection point?')
+    if (value) {
+      try {
+        const {data} = await axios.delete(`collection-points/${collectionPointId}`)
+        getCollectionPoints()
+      } catch (err) {
+        console.log(err)
+      }
+    }
+  }
+
+  const onModalClose = () => {
+    cleanStateAndCloseModal()
+  }
+
+  const updateCollectionPoint = async () => {
+    const value = window.confirm('you sure you want to save changes?')
+    if (value) {
+      try {
+        const {data} = await axios.put(`collection-points/${currentCollectionPoint.id}`, {
+          name: currentCollectionPoint.name,
+          trashCollectionSize: currentCollectionPoint.trashCollectionSize,
+          cityId: currentCollectionPoint.city.id,
+          connectionWithRecycle: currentCollectionPoint.connectionsWithRecycleToPost,
+        })
+        cleanStateAndCloseModal()
+        getCollectionPoints()
+      } catch (err) {
+        console.log(err)
+      }
+    }
+  }
+
+  const disconnectWithRecyclePoint = async (connectionId: number) => {
+    const value = window.confirm('you sure you want to disconnect with recycle point?')
+    if (value) {
+      try {
+        const {data} = await axios.delete(`collection-recycle-connection/${connectionId}`)
+        getCollectionPoints()
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 
@@ -73,6 +149,12 @@ function CollectionPointsContainer() {
       setCurrentCollectionPoint={setCurrentCollectionPoint}
       recyclePoints={recyclePoints}
       connectWithRecyclePoint={connectWithRecyclePoint}
+      createCollectionPoint={createCollectionPoint}
+      deleteCollectionPoint={deleteCollectionPoint}
+      openUpdateModal={openUpdateModal}
+      onModalClose={onModalClose}
+      updateCollectionPoint={updateCollectionPoint}
+      disconnectWithRecyclePoint={disconnectWithRecyclePoint}
     />
   )
 }

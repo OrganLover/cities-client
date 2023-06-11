@@ -1,5 +1,6 @@
 import {ICollectionPointProps} from '../../types/collectionPointTypes'
 import {Modal} from '../common/Modal'
+import Menu from '../common/Menu'
 
 function CollectionPoints({
   collectionPoints,
@@ -9,9 +10,16 @@ function CollectionPoints({
   setCurrentCollectionPoint,
   recyclePoints,
   connectWithRecyclePoint,
+  createCollectionPoint,
+  deleteCollectionPoint,
+  openUpdateModal,
+  onModalClose,
+  updateCollectionPoint,
+  disconnectWithRecyclePoint,
 }: ICollectionPointProps) {
   return (
     <div>
+      <Menu />
       <button onClick={() => setModal({mode: 'post', opened: true})}>Add collection point</button>
       {collectionPoints.map((item) => {
         return (
@@ -30,7 +38,7 @@ function CollectionPoints({
               </span>
             </div>
             <div>
-              <span>connections with recycle:</span>
+              {item.connectionWithRecycle.length > 0 && <b>connections with recycle:</b>}
               {item.connectionWithRecycle.map((con) => {
                 return (
                   <div>
@@ -39,19 +47,20 @@ function CollectionPoints({
                         <b>
                           ({con.recyclePoint.name}) - {con.distance} miles
                         </b>
+                        <button onClick={() => disconnectWithRecyclePoint(con.id)}>disconnect</button>
                       </div>
                     </div>
                   </div>
                 )
               })}
             </div>
-            <button onClick={() => setModal({mode: 'patch', opened: true})}>update</button>
-            <button>delete</button>
+            <button onClick={() => openUpdateModal(item)}>update</button>
+            <button onClick={() => deleteCollectionPoint(item.id)}>delete</button>
           </div>
         )
       })}
       {modal.opened && modal.mode === 'post' && (
-        <Modal onModalClose={() => setModal({mode: '', opened: false})}>
+        <Modal onModalClose={onModalClose}>
           <div>
             <span>add collection point</span>
             <div>
@@ -75,8 +84,12 @@ function CollectionPoints({
                 <label htmlFor='collectionPointCityId'>collection point cityId</label>
                 <input
                   name='collectionPointCityId'
-                  onChange={(e) => setCurrentCollectionPoint({cityId: Number(e.target.value)})}
-                  value={currentCollectionPoint.cityId}
+                  onChange={(e) =>
+                    setCurrentCollectionPoint({
+                      city: {...currentCollectionPoint.city, id: Number(e.target.value)},
+                    })
+                  }
+                  value={currentCollectionPoint.city.id}
                 />
               </div>
               <div>
@@ -92,30 +105,100 @@ function CollectionPoints({
                         </div>
                       </div>
                       <div>
-                        <button onClick={() => connectWithRecyclePoint}>connect</button>
+                        {currentCollectionPoint.connectionsWithRecycleToPost.some(
+                          (con) => con.recyclePointId === item.id,
+                        ) ? (
+                          <b>
+                            {`ready(distance ${
+                              currentCollectionPoint.connectionsWithRecycleToPost.find(
+                                (con) => con.recyclePointId === item.id,
+                              )?.distance
+                            })`}
+                          </b>
+                        ) : (
+                          <button onClick={() => connectWithRecyclePoint(item.id)}>connect</button>
+                        )}
                       </div>
                     </div>
                   )
                 })}
               </div>
             </div>
-            <button>add collection point</button>
+            <button onClick={createCollectionPoint}>add collection point</button>
           </div>
         </Modal>
       )}
       {modal.opened && modal.mode === 'patch' && (
-        <Modal onModalClose={() => setModal({mode: '', opened: false})}>
+        <Modal onModalClose={onModalClose}>
           <div>
             <span>update collection point</span>
             <div>
-              <label htmlFor='collectionPointName'>collection point name</label>
-              <input
-                name='collectionPointName'
-                onChange={(e) => setCurrentCollectionPoint({name: e.target.value})}
-                value={currentCollectionPoint.name}
-              />
+              <div>
+                <label htmlFor='collectionPointName'>collection point name</label>
+                <input
+                  name='collectionPointName'
+                  onChange={(e) => setCurrentCollectionPoint({name: e.target.value})}
+                  value={currentCollectionPoint.name}
+                />
+              </div>
+              <div>
+                <label htmlFor='collectionPointTrashSize'>collection point trashSize</label>
+                <input
+                  name='collectionPointTrashSize'
+                  onChange={(e) => setCurrentCollectionPoint({trashCollectionSize: Number(e.target.value)})}
+                  value={currentCollectionPoint.trashCollectionSize}
+                />
+              </div>
+              <div>
+                {recyclePoints.map((item) => {
+                  return (
+                    <div style={{display: 'flex', justifyContent: 'space-between', marginBlock: '10px'}}>
+                      <div>
+                        <div>
+                          <b>name:</b> {item.name}
+                        </div>
+                        <div>
+                          <b>trashRecycleSize:</b> {item.trashRecycleSize}
+                        </div>
+                      </div>
+                      <div>
+                        {currentCollectionPoint.connectionWithRecycle.some(
+                          (con) => con.recyclePoint.id === item.id,
+                        ) ? (
+                          <div>
+                            <span>connected</span>
+                            <button
+                              onClick={() =>
+                                disconnectWithRecyclePoint(
+                                  item.connectionWithCollection.find(
+                                    (con) => con.collectionPoint.id === currentCollectionPoint.id,
+                                  )!.id,
+                                )
+                              }
+                            >
+                              disconnect
+                            </button>
+                          </div>
+                        ) : currentCollectionPoint.connectionsWithRecycleToPost.some(
+                            (con) => con.recyclePointId === item.id,
+                          ) ? (
+                          <b>
+                            {`ready(distance ${
+                              currentCollectionPoint.connectionsWithRecycleToPost.find(
+                                (con) => con.recyclePointId === item.id,
+                              )?.distance
+                            })`}
+                          </b>
+                        ) : (
+                          <button onClick={() => connectWithRecyclePoint(item.id)}>connect</button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-            <button>update collection point</button>
+            <button onClick={updateCollectionPoint}>update collection point</button>
           </div>
         </Modal>
       )}
