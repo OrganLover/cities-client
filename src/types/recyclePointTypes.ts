@@ -5,7 +5,12 @@ import {ICollectionPoint} from './collectionPointTypes'
 
 export interface IRecyclePoint {
   id: number
-  city: ICity | null
+  city: {
+    id: number
+    name: string
+    createdAt: string
+    updatedAt: string
+  }
   name: string
   createdAt: string
   updatedAt: string
@@ -26,4 +31,5 @@ export interface IRecyclePointProps {
   deleteRecyclePoint: (recyclePointId: number) => void
   onModalClose: () => void
   getShortestWayToCPs: (recyclePointId: IRecyclePoint) => void
+  cities: ICity[]
 }

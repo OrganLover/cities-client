@@ -4,6 +4,7 @@ import axios from '../../api/api'
 import {ICollectionPoint, ICurrentCollectionPoint} from '../../types/collectionPointTypes'
 import {IModal} from '../../types/otherTypes'
 import {IRecyclePoint} from '../../types/recyclePointTypes'
+import {ICity} from '../../types/cityTypes'
 
 function CollectionPointsContainer() {
   const reducer = (prevState: ICurrentCollectionPoint, newState: Partial<ICurrentCollectionPoint>) => {
@@ -30,11 +31,13 @@ function CollectionPointsContainer() {
   const [currentCollectionPoint, setCurrentCollectionPoint] = useReducer(reducer, initState)
   const [collectionPoints, setCollectionPoints] = useState<ICollectionPoint[]>([])
   const [recyclePoints, setRecyclePoints] = useState<IRecyclePoint[]>([])
+  const [cities, setCities] = useState<ICity[]>([])
   const [modal, setModal] = useState<IModal>({mode: '', opened: false})
 
   useEffect(() => {
     getCollectionPoints()
     getRecyclePoints()
+    getCities()
   }, [])
 
   const getCollectionPoints = async () => {
@@ -45,6 +48,15 @@ function CollectionPointsContainer() {
   const getRecyclePoints = async () => {
     const {data} = await axios.get('recycle-points')
     setRecyclePoints(data)
+  }
+
+  const getCities = async () => {
+    try {
+      const {data} = await axios.get('cities')
+      setCities(data)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   const createCollectionPoint = async () => {
@@ -155,6 +167,7 @@ function CollectionPointsContainer() {
       onModalClose={onModalClose}
       updateCollectionPoint={updateCollectionPoint}
       disconnectWithRecyclePoint={disconnectWithRecyclePoint}
+      cities={cities}
     />
   )
 }

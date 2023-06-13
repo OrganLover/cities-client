@@ -33,6 +33,7 @@ export interface ICollectionPointProps {
   onModalClose: () => void
   updateCollectionPoint: () => void
   disconnectWithRecyclePoint: (connectionId: number) => void
+  cities: ICity[]
 }
 
 export interface ICurrentCollectionPoint extends ICollectionPoint {

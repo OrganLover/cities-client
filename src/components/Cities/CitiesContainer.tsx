@@ -4,22 +4,22 @@ import Cities from './Cities'
 import {IModal} from '../../types/otherTypes'
 import {ICity, ICityConnection, ICurrentCity} from '../../types/cityTypes'
 
+const reducer = (state: ICurrentCity, newState: Partial<ICurrentCity>) => {
+  return {...state, ...newState}
+}
+
+const currentCityInit: ICurrentCity = {
+  id: 0,
+  name: '',
+  collectionPoints: [],
+  connections: [],
+  createdAt: '',
+  recyclePoints: [],
+  updatedAt: '',
+  connectionsToPost: [],
+}
+
 function CitiesContainer() {
-  const reducer = (state: ICurrentCity, newState: Partial<ICurrentCity>) => {
-    return {...state, ...newState}
-  }
-
-  const currentCityInit: ICurrentCity = {
-    id: 0,
-    name: '',
-    collectionPoints: [],
-    connections: [],
-    createdAt: '',
-    recyclePoints: [],
-    updatedAt: '',
-    connectionsToPost: [],
-  }
-
   const [currentCity, setCurrentCity] = useReducer(reducer, currentCityInit)
   const [cities, setCities] = useState<ICity[]>([])
   const [modal, setModal] = useState<IModal>({mode: '', opened: false})
@@ -32,7 +32,6 @@ function CitiesContainer() {
     try {
       const {data} = await axios.get('cities')
       setCities(data)
-      console.log(data)
     } catch (err) {
       console.log(err)
     }
@@ -90,7 +89,6 @@ function CitiesContainer() {
     if (value) {
       try {
         const {data} = await axios.delete(`cities/${city.id}`)
-        cleanStateAndCloseModal()
         getCities()
       } catch (err) {
         console.log(err)

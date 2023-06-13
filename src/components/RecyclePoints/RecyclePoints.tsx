@@ -14,6 +14,7 @@ function RecyclePoints({
   deleteRecyclePoint,
   onModalClose,
   getShortestWayToCPs,
+  cities,
 }: IRecyclePointProps) {
   return (
     <div>
@@ -39,7 +40,7 @@ function RecyclePoints({
               {item.connectionWithCollection.length > 0 && <span>connections with collection points:</span>}
               {item.connectionWithCollection.map((con) => {
                 return (
-                  <div>
+                  <div key={con.id}>
                     <div>
                       <div>
                         <b>
@@ -73,12 +74,25 @@ function RecyclePoints({
                 />
               </div>
               <div>
-                <label htmlFor='recyclePointCityId'>recycle point cityId</label>
-                <input
-                  name='recyclePointCityId'
-                  onChange={(e) => setCurrentRecyclePoint({id: Number(e.target.value)})}
-                  value={currentRecyclePoint.id}
-                />
+                <label htmlFor='recyclePointCity'>recycle point city</label>
+                <select
+                  onChange={(e) =>
+                    setCurrentRecyclePoint({
+                      city: {...currentRecyclePoint.city, id: Number(e.target.value)},
+                    })
+                  }
+                  name='recyclePointCity'
+                  id='city-select'
+                >
+                  <option value=''>--choose city--</option>
+                  {cities.map((city) => {
+                    return (
+                      <option key={city.id} value={city.id}>
+                        {city.name}
+                      </option>
+                    )
+                  })}
+                </select>
               </div>
             </div>
             <button onClick={createRecyclePoint}>add recycle point</button>

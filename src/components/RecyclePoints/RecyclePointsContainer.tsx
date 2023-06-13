@@ -3,6 +3,7 @@ import RecyclePoints from './RecyclePoints'
 import {IRecyclePoint} from '../../types/recyclePointTypes'
 import axios from '../../api/api'
 import {IModal} from '../../types/otherTypes'
+import {ICity} from '../../types/cityTypes'
 
 function RecyclePointsContainer() {
   const reducer = (prevState: IRecyclePoint, newState: Partial<IRecyclePoint>) => {
@@ -11,7 +12,12 @@ function RecyclePointsContainer() {
 
   const initState: IRecyclePoint = {
     id: 0,
-    city: null,
+    city: {
+      id: 0,
+      name: '',
+      createdAt: '',
+      updatedAt: '',
+    },
     name: '',
     createdAt: '',
     updatedAt: '',
@@ -22,10 +28,12 @@ function RecyclePointsContainer() {
 
   const [currentRecyclePoint, setCurrentRecyclePoint] = useReducer(reducer, initState)
   const [recyclePoints, setRecyclePoints] = useState<IRecyclePoint[]>([])
+  const [cities, setCities] = useState<ICity[]>([])
   const [modal, setModal] = useState<IModal>({mode: '', opened: false})
 
   useEffect(() => {
     getRecyclePoints()
+    getCities()
   }, [])
 
   const getRecyclePoints = async () => {
@@ -37,11 +45,21 @@ function RecyclePointsContainer() {
     }
   }
 
+  const getCities = async () => {
+    try {
+      const {data} = await axios.get('cities')
+      setCities(data)
+      console.log(data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   const createRecyclePoint = async () => {
     try {
       const {data} = await axios.post('recycle-points', {
         name: currentRecyclePoint.name,
-        cityId: currentRecyclePoint.id,
+        cityId: currentRecyclePoint.city.id,
       })
       cleanStateAndCloseModal()
       getRecyclePoints()
@@ -119,6 +137,7 @@ function RecyclePointsContainer() {
       deleteRecyclePoint={deleteRecyclePoint}
       onModalClose={onModalClose}
       getShortestWayToCPs={getShortestWayToCPs}
+      cities={cities}
     />
   )
 }

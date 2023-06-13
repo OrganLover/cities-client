@@ -16,6 +16,7 @@ function CollectionPoints({
   onModalClose,
   updateCollectionPoint,
   disconnectWithRecyclePoint,
+  cities,
 }: ICollectionPointProps) {
   return (
     <div>
@@ -38,10 +39,15 @@ function CollectionPoints({
               </span>
             </div>
             <div>
+              <span>
+                city: <b>{item.city.name}</b>
+              </span>
+            </div>
+            <div>
               {item.connectionWithRecycle.length > 0 && <b>connections with recycle:</b>}
               {item.connectionWithRecycle.map((con) => {
                 return (
-                  <div>
+                  <div key={con.id}>
                     <div>
                       <div>
                         <b>
@@ -81,21 +87,34 @@ function CollectionPoints({
                 />
               </div>
               <div>
-                <label htmlFor='collectionPointCityId'>collection point cityId</label>
-                <input
-                  name='collectionPointCityId'
+                <label htmlFor='collectionPointCity'>city</label>
+                <select
                   onChange={(e) =>
                     setCurrentCollectionPoint({
                       city: {...currentCollectionPoint.city, id: Number(e.target.value)},
                     })
                   }
-                  value={currentCollectionPoint.city.id}
-                />
+                  name='collectionPointCity'
+                  id='city-select'
+                  required
+                >
+                  <option value=''>--choose city--</option>
+                  {cities.map((city) => {
+                    return (
+                      <option key={city.id} value={city.id}>
+                        {city.name}
+                      </option>
+                    )
+                  })}
+                </select>
               </div>
               <div>
                 {recyclePoints.map((item) => {
                   return (
-                    <div style={{display: 'flex', justifyContent: 'space-between', marginBlock: '10px'}}>
+                    <div
+                      key={item.id}
+                      style={{display: 'flex', justifyContent: 'space-between', marginBlock: '10px'}}
+                    >
                       <div>
                         <div>
                           <b>name:</b> {item.name}
@@ -152,7 +171,10 @@ function CollectionPoints({
               <div>
                 {recyclePoints.map((item) => {
                   return (
-                    <div style={{display: 'flex', justifyContent: 'space-between', marginBlock: '10px'}}>
+                    <div
+                      key={item.id}
+                      style={{display: 'flex', justifyContent: 'space-between', marginBlock: '10px'}}
+                    >
                       <div>
                         <div>
                           <b>name:</b> {item.name}

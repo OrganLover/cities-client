@@ -24,7 +24,7 @@ function Cities({
         {cities.map((city) => {
           return (
             <div key={city.id} style={{backgroundColor: 'lightgrey', fontSize: '20px'}}>
-              <span>{city.name}</span>
+              <span style={{fontSize: '25px'}}>{city.name}</span>
               <div>
                 {city.connections.length !== 0 && <b>connected cities: </b>}
                 {city.connections.map((con) => {
@@ -33,7 +33,7 @@ function Cities({
                       <div>
                         {city.id === con.initiator.id ? con.applier.name : con.initiator.name} -{' '}
                         {con.distance}miles
-                        <button onClick={() => deleteConnection(con)}>delete connection</button>
+                        <button onClick={() => deleteConnection(con)}>disconnect</button>
                       </div>
                     </div>
                   )
